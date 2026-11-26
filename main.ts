@@ -1,10 +1,10 @@
 // The Painfully Honest Out-of-Office — make.fun bounty entry.
 // Writes the entry sentence to $MAKEFUN_OUTPUT_DIR/entry.txt (default /output).
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const ENTRY =
-  "I am out of the office recharging the enthusiasm I spent answering emails like this one, and will reply when I have some to spare.";
+  "I am out of the office recharging the enthusiasm I burned answering emails like this one, and will reply when I have some to spare.";
 const MIN_CHARS = 1;
 const MAX_CHARS = 200;
 
@@ -30,7 +30,11 @@ function main(): void {
   checkEntry(ENTRY);
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, "entry.txt"), ENTRY, "utf8");
+  const outFile = join(outDir, "entry.txt");
+  writeFileSync(outFile, ENTRY, "utf8");
+  if (readFileSync(outFile, "utf8") !== ENTRY) {
+    throw new Error("entry.txt did not round-trip");
+  }
 }
 
 main();
